@@ -1,0 +1,24 @@
+84,90c84,86
+<      ! call model_prem_iso(radius,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,.false., &
+<      !                     ONE_CRUST,.false.,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<      !                     R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+<      ! Ebru - MARS
+<       call model_Sohl(myrank,radius,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,.false., &
+<           ONE_CRUST,.false.,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<           R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+---
+>       call model_prem_iso(radius,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,.false., &
+>                           ONE_CRUST,.false.,RICB,RCMB,RTOPDDOUBLEPRIME, &
+>                           R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+149,155c145,147
+<       ! call model_prem_iso(radius,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,.false., &
+<       !                     ONE_CRUST,.false.,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<       !                     R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+<       ! Ebru - MARS
+<       call model_Sohl(myrank,radius,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,.false., &
+<            ONE_CRUST,.false.,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<            R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+---
+>        call model_prem_iso(radius,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,.false., &
+>                            ONE_CRUST,.false.,RICB,RCMB,RTOPDDOUBLEPRIME, &
+>                            R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
