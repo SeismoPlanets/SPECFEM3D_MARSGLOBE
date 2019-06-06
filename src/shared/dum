@@ -1,0 +1,748 @@
+14c14
+< ! the Free Software Foundation; either version 3 of the License, or
+---
+> ! the Free Software Foundation; either version 2 of the License, or
+30c30,35
+< ! PREM [Dziewonski and Anderson, 1981].
+---
+> ! Isotropic version of the spherically symmetric Reference Mars Model
+> ! model A in the reference
+> !  
+> ! Sohl, F., and T. Spohn (1997), The interior structure of Mars: Implications
+> ! from SNC meteorites, J. Geophys. Res., 102(E1), 1613–1635,
+> ! doi:10.1029/96JE03419.
+32,37d36
+< ! A. M. Dziewonski and D. L. Anderson.
+< ! Preliminary reference Earth model.
+< ! Phys. Earth Planet. Inter., 25:297-356, 1981.
+< !
+< ! Isotropic (iso) and transversely isotropic (aniso) version of the
+< ! spherically symmetric Preliminary Reference Earth Model
+42,44c41,43
+<   subroutine model_prem_iso(x,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,CRUSTAL, &
+<                             ONE_CRUST,check_doubling_flag,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<                             R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+---
+>   subroutine model_Sohl(x,rho,drhodr,vp,vs,Qkappa,Qmu,idoubling,CRUSTAL, &
+>       ONE_CRUST,check_doubling_flag,RICB,RCMB,RTOPDDOUBLEPRIME, &
+>       R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+53c52
+<   logical :: CRUSTAL,ONE_CRUST,check_doubling_flag
+---
+>   logical CRUSTAL,ONE_CRUST,check_doubling_flag
+55c54
+<   integer :: idoubling
+---
+>   integer idoubling!,myrank
+57c56
+<   double precision :: x,rho,drhodr,vp,vs,Qkappa,Qmu,RICB,RCMB,RTOPDDOUBLEPRIME, &
+---
+>   double precision x,rho,drhodr,vp,vs,Qkappa,Qmu,RICB,RCMB,RTOPDDOUBLEPRIME, &
+60c59
+<   double precision :: r,scaleval
+---
+>   double precision r,scaleval, x_moho
+72a72,77
+>       if (myrank == 0) print*,idoubling
+>       if (myrank == 0) print*,IFLAG_INNER_CORE_NORMAL
+>       if (myrank == 0) print*,IFLAG_MIDDLE_CENTRAL_CUBE
+>       if (myrank == 0) print*,IFLAG_BOTTOM_CENTRAL_CUBE
+>       if (myrank == 0) print*,IFLAG_TOP_CENTRAL_CUBE
+>       if (myrank == 0) print*,IFLAG_IN_FICTITIOUS_CUBE
+96c101
+<         call exit_MPI(myrank,'wrong doubling flag for top D" to d670 point in model_prem_iso()')
+---
+>         call exit_MPI(myrank,'wrong doubling flag for top D" -> d670 point in model_prem_iso()')
+102c107
+<         call exit_MPI(myrank,'wrong doubling flag for d670 to d220 point in model_prem_iso()')
+---
+>         call exit_MPI(myrank,'wrong doubling flag for d670 -> d220 point in model_prem_iso()')
+108c113
+<         call exit_MPI(myrank,'wrong doubling flag for d220 to Moho to surface point in model_prem_iso()')
+---
+>         call exit_MPI(myrank,'wrong doubling flag for d220 -> Moho -> surface point in model_prem_iso()')
+117,120c122,128
+<     drhodr=-2.0d0*8.8381d0*x
+<     rho=13.0885d0-8.8381d0*x*x
+<     vp=11.2622d0-6.3640d0*x*x
+<     vs=3.6678d0-4.4475d0*x*x
+---
+>     drhodr=-13.4654d-3-2.0d0*1.6906d0*x-3.0d0*0.4225d0*x*x
+>     !rho=7.2942d0-13.4654d-3*x-1.6906d0*x*x-0.4225d0*x*x*x
+>     !vp=6.5395d0-22.5299d-3*x-2.3767d0*x*x-7.2716d-1*x*x*x
+>     !vs=2.4d0
+>     rho=8.752d0
+>     vp=7.3d0
+>     vs=3d0
+127,129c135,137
+<     drhodr=-1.2638d0-2.0d0*3.6426d0*x-3.0d0*5.5281d0*x*x
+<     rho=12.5815d0-1.2638d0*x-3.6426d0*x*x-5.5281d0*x*x*x
+<     vp=11.0487d0-4.0362d0*x+4.8023d0*x*x-13.5732d0*x*x*x
+---
+>     drhodr=-13.4654d-3-2.0d0*1.6906d0*x-3.0d0*0.4225d0*x*x
+>     rho=7.2942d0-13.4654d-3*x-1.6906d0*x*x-0.4225d0*x*x*x
+>     vp=6.5395d0-22.5299d-3*x-2.3767d0*x*x-7.2716d-1*x*x*x
+137,140c145,148
+<     drhodr=-6.4761d0+2.0d0*5.5283d0*x-3.0d0*3.0807d0*x*x
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+<     vp=15.3891d0-5.3181d0*x+5.5242d0*x*x-2.5514d0*x*x*x
+<     vs=6.9254d0+1.4672d0*x-2.0834d0*x*x+0.9783d0*x*x*x
+---
+>     drhodr=-0.5184d0-2.0d0*3.2190d-2*x-3.0d0*1.3738d-1*x*x
+>     rho=4.5706d0-0.5184d0*x-3.2190d-2*x*x-1.3738d-1*x*x*x
+>     vp=11.4166d0-9.0421d-1*x-2.6380d0*x*x+9.4287d-1*x*x*x
+>     vs=6.7644d0-2.3139d0*x+1.7809d0*x*x-1.5312d0*x*x*x
+147,150c155,158
+<     drhodr=-6.4761d0+2.0d0*5.5283d0*x-3.0d0*3.0807d0*x*x
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+<     vp=24.9520d0-40.4673d0*x+51.4832d0*x*x-26.6419d0*x*x*x
+<     vs=11.1671d0-13.7818d0*x+17.4575d0*x*x-9.2777d0*x*x*x
+---
+>     drhodr=-0.5184d0-2.0d0*3.2190d-2*x-3.0d0*1.3738d-1*x*x
+>     rho=4.5706d0-0.5184d0*x-3.2190d-2*x*x-1.3738d-1*x*x*x
+>     vp=11.4166d0-9.0421d-1*x-2.6380d0*x*x+9.4287d-1*x*x*x
+>     vs=6.7644d0-2.3139d0*x+1.7809d0*x*x-1.5312d0*x*x*x
+152a161
+> 
+154,157c163,166
+<     drhodr=-6.4761d0+2.0d0*5.5283d0*x-3.0d0*3.0807d0*x*x
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+<     vp=29.2766d0-23.6027d0*x+5.5242d0*x*x-2.5514d0*x*x*x
+<     vs=22.3459d0-17.2473d0*x-2.0834d0*x*x+0.9783d0*x*x*x
+---
+>     drhodr=-5.8162d-1+2.0d0*1.7083d-1*x-3.0d0*3.0264d-1*x*x
+>     rho=4.4067d0-5.8162d-1*x+1.7083d-1*x*x-3.0264d-1*x*x*x
+>     vp=11.8365d0-4.1713d0*x+3.1366d0*x*x-2.5691d0*x*x*x
+>     vs=6.5172d0-1.8055d0*x+8.0800d-1*x*x-9.5676d-1*x*x*x
+164,167c173,176
+<     drhodr=-1.4836d0
+<     rho=5.3197d0-1.4836d0*x
+<     vp=19.0957d0-9.8672d0*x
+<     vs=9.9839d0-4.9324d0*x
+---
+>     drhodr=-0.8166d0+2.0d0*0.4844d0*x-3.0d0*0.4175d0*x*x
+>     rho=4.1601d0-0.8166d0*x+0.4844d0*x*x-0.4175d0*x*x*x
+>     vp=11.9300d0-4.8826d0*x+3.5016d0*x*x-2.5538d0*x*x*x
+>     vs=6.5847d0-2.5543d0*x+1.6024d0*x*x-1.2675d0*x*x*x
+169a179
+> 
+171,174c181,184
+<     drhodr=-8.0298d0
+<     rho=11.2494d0-8.0298d0*x
+<     vp=39.7027d0-32.6166d0*x
+<     vs=22.3512d0-18.5856d0*x
+---
+>     drhodr=-0.8166d0+2.0d0*0.4844d0*x-3.0d0*0.4175d0*x*x
+>     rho=4.1601d0-0.8166d0*x+0.4844d0*x*x-0.4175d0*x*x*x
+>     vp=11.9300d0-4.8826d0*x+3.5016d0*x*x-2.5538d0*x*x*x
+>     vs=6.5847d0-2.5543d0*x+1.6024d0*x*x-1.2675d0*x*x*x
+176a187
+> 
+178,181c189,192
+<     drhodr=-3.8045d0
+<     rho=7.1089d0-3.8045d0*x
+<     vp=20.3926d0-12.2569d0*x
+<     vs=8.9496d0-4.4597d0*x
+---
+>     drhodr=-0.8166d0+2.0d0*0.4844d0*x-3.0d0*0.4175d0*x*x
+>     rho=4.1601d0-0.8166d0*x+0.4844d0*x*x-0.4175d0*x*x*x
+>     vp=11.9300d0-4.8826d0*x+3.5016d0*x*x-2.5538d0*x*x*x
+>     vs=6.5847d0-2.5543d0*x+1.6024d0*x*x-1.2675d0*x*x*x
+183a195
+> 
+185,188c197,200
+<     drhodr=0.6924d0
+<     rho=2.6910d0+0.6924d0*x
+<     vp=4.1875d0+3.9382d0*x
+<     vs=2.1519d0+2.3481d0*x
+---
+>     drhodr=-3.4678d01+2.0d0*4.0167d01*x-3.0d0*1.5572d01*x*x
+>     rho=1.3572d01-3.4678d01*x+4.0167d01*x*x-1.5572d01*x*x*x
+>     vp=1.5559d01-1.7460d01*x+1.8004d01*x*x-8.1157d0*x*x*x
+>     vs=2.2395d01-5.7011d01*x+6.3447d01*x*x-2.4406d01*x*x*x
+193c205
+< ! fill with PREM mantle and later add CRUST2.0
+---
+>       ! fill with mantle and later add CRUST2.0
+196,199c208,211
+<         drhodr=0.6924d0
+<         rho=2.6910d0+0.6924d0*x
+<         vp=4.1875d0+3.9382d0*x
+<         vs=2.1519d0+2.3481d0*x
+---
+>         drhodr=-3.4678d01+2.0d0*4.0167d01*x-3.0d0*1.5572d01*x*x
+>         rho=1.3572d01-3.4678d01*x+4.0167d01*x*x-1.5572d01*x*x*x
+>         vp=1.5559d01-1.7460d01*x+1.8004d01*x*x-8.1157d0*x*x*x
+>         vs=2.2395d01-5.7011d01*x+6.3447d01*x*x-2.4406d01*x*x*x
+205d216
+< ! use PREM crust
+207,210c218,221
+<         drhodr=0.6924d0
+<         rho=2.6910d0+0.6924d0*x
+<         vp=4.1875d0+3.9382d0*x
+<         vs=2.1519d0+2.3481d0*x
+---
+>         drhodr=1.7831d0+2.0d0*1.2168d0*x-3.0d0*1.7209d0*x*x
+>         rho=2.2095d0+1.7831d0*x+1.2168d0*x*x-1.7209d0*x*x*x
+>         vp=1.4372d01-1.3395d01*x+1.3353d01*x*x-6.3398d0*x*x*x
+>         vs=8.6113d0-1.1932d01*x+1.4301d01*x*x-6.5441d0*x*x*x
+215,219c226,231
+< !! DK DK extend the Moho up to the surface instead of the crust
+<         drhodr=0.6924d0
+<         rho = 2.6910d0+0.6924d0*(RMOHO / R_EARTH)
+<         vp = 4.1875d0+3.9382d0*(RMOHO / R_EARTH)
+<         vs = 2.1519d0+2.3481d0*(RMOHO / R_EARTH)
+---
+>         ! DK DK extend the Moho up to the surface instead of the crust
+>         x_moho = RMOHO / R_EARTH
+>         drhodr=1.7831d0+2.0d0*1.2168d0*x_moho-3.0d0*1.7209d0*x_moho*x_moho
+>         rho=2.2095d0+1.7831d0*x_moho+1.2168d0*x_moho*x_moho-1.7209d0*x_moho*x_moho*x_moho
+>         vp=1.4372d01-1.3395d01*x_moho+1.3353d01*x_moho*x_moho-6.3398d0*x_moho*x_moho*x_moho
+>         vs=8.6113d0-1.1932d01*x_moho+1.4301d01*x_moho*x_moho-6.5441d0*x_moho*x_moho*x_moho
+224,227c236,239
+<         drhodr=0.0d0
+<         rho=2.9d0
+<         vp=6.8d0
+<         vs=3.9d0
+---
+>         drhodr=1.2062d02-2.0d0*1.2140d02*x+3.0d0*4.0519d01*x*x
+>         rho=-3.6937d01+1.2062d02*x-1.2140d02*x*x+4.0519d01*x*x*x
+>         vp=5.0537d01-1.2368d02*x+1.2381d02*x*x-4.3012d01*x*x*x
+>         vs=-4.3819d01+1.4853d02*x-1.5121d02*x*x+5.0526d01*x*x*x
+231c243,246
+< ! same properties everywhere in PREM crust if we decide to define only one layer in the crust
+---
+>         ! Youyi Ruan  Mars 06/26/2016
+>         ! same properties everywhere in Mars crust if we decide to 
+>         ! define only one layer in the crust. Use the value at 
+>         ! 60 km depth (r = 3330 km) in modSOHL from IPGP
+234,236c249,251
+<           rho=2.6d0
+<           vp=5.8d0
+<           vs=3.2d0
+---
+>           rho=2.815d0
+>           vp=7.747d0
+>           vs=4.069d0
+242,245c257,260
+<         drhodr=0.0d0
+<         rho=2.6d0
+<         vp=5.8d0
+<         vs=3.2d0
+---
+>         drhodr=1.2062d02-2.0d0*1.2140d02*x+3.0d0*4.0519d01*x*x
+>         rho=-3.6937d01+1.2062d02*x-1.2140d02*x*x+4.0519d01*x*x*x
+>         vp=5.0537d01-1.2368d02*x+1.2381d02*x*x-4.3012d01*x*x*x
+>         vs=-4.3819d01+1.4853d02*x-1.5121d02*x*x+5.0526d01*x*x*x
+248c263,266
+< ! for density profile for gravity, we do not check that r <= R_EARTH
+---
+> 
+>       ! for density profile for gravity, we do not check that r <= R_EARTH
+>       ! Youyi Ruan MARS 06/26/2016
+>       ! Obviously will not be used for Mars but could keep it for regolith
+250,253c268,271
+<         drhodr=0.0d0
+<         rho=2.6d0
+<         vp=5.8d0
+<         vs=3.2d0
+---
+>         drhodr=1.2062d02-2.0d0*1.2140d02*x+3.0d0*4.0519d01*x*x
+>         rho=-3.6937d01+1.2062d02*x-1.2140d02*x*x+4.0519d01*x*x*x
+>         vp=5.0537d01-1.2368d02*x+1.2381d02*x*x-4.3012d01*x*x*x
+>         vs=-4.3819d01+1.4853d02*x-1.5121d02*x*x+5.0526d01*x*x*x
+258,279d275
+<     endif
+<   endif
+< 
+< ! non-dimensionalize
+< ! time scaling (s^{-1}) is done with scaleval
+<   scaleval = dsqrt(PI*GRAV*RHOAV)
+<   drhodr = drhodr * 1000.0d0/RHOAV
+<   rho = rho * 1000.0d0/RHOAV
+<   vp = vp * 1000.0d0/(R_EARTH*scaleval)
+<   vs = vs * 1000.0d0/(R_EARTH*scaleval)
+< 
+<   end subroutine model_prem_iso
+< 
+< !
+< !=====================================================================
+< !
+< 
+<   subroutine model_prem_aniso(x,rho,vpv,vph,vsv,vsh,eta_aniso,Qkappa,Qmu, &
+<                               idoubling,CRUSTAL,ONE_CRUST,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<                               R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+< 
+<   use constants
+281,324d276
+<   implicit none
+< 
+< ! given a normalized radius x, gives the non-dimensionalized density rho,
+< ! speeds vp and vs, and the quality factors Qkappa and Qmu
+< 
+<   logical :: CRUSTAL,ONE_CRUST
+< 
+<   integer :: idoubling
+< 
+<   double precision :: x,rho,Qkappa,Qmu,vpv,vph,vsv,vsh,eta_aniso,RICB,RCMB, &
+<       RTOPDDOUBLEPRIME,R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN
+< 
+<   double precision :: r
+<   double precision :: scaleval
+< 
+< ! compute real physical radius in meters
+<   r = x * R_EARTH
+< 
+< ! check flags to make sure we correctly honor the discontinuities
+< ! we use strict inequalities since r has been slightly changed in mesher
+< 
+< !
+< !--- inner core
+< !
+<   if (r >= 0.d0 .and. r < RICB) then
+<     if (idoubling /= IFLAG_INNER_CORE_NORMAL .and. &
+<        idoubling /= IFLAG_MIDDLE_CENTRAL_CUBE .and. &
+<        idoubling /= IFLAG_BOTTOM_CENTRAL_CUBE .and. &
+<        idoubling /= IFLAG_TOP_CENTRAL_CUBE .and. &
+<        idoubling /= IFLAG_IN_FICTITIOUS_CUBE) &
+<          call exit_MPI(myrank,'wrong doubling flag for inner core point in model_prem_aniso()')
+< !
+< !--- outer core
+< !
+<   else if (r > RICB .and. r < RCMB) then
+<     if (idoubling /= IFLAG_OUTER_CORE_NORMAL) &
+<       call exit_MPI(myrank,'wrong doubling flag for outer core point in model_prem_aniso()')
+< !
+< !--- D" at the base of the mantle
+< !
+<   else if (r > RCMB .and. r < RTOPDDOUBLEPRIME) then
+<     if (idoubling /= IFLAG_MANTLE_NORMAL) then
+<       print *,'Error dprime point:',r, RCMB,RTOPDDOUBLEPRIME,idoubling,IFLAG_MANTLE_NORMAL
+<       call exit_MPI(myrank,'wrong doubling flag for D" point in model_prem_aniso()')
+326,459d277
+< !
+< !--- mantle: from top of D" to d670
+< !
+<   else if (r > RTOPDDOUBLEPRIME .and. r < R670) then
+<     if (idoubling /= IFLAG_MANTLE_NORMAL) &
+<       call exit_MPI(myrank,'wrong doubling flag for top D" to d670 point in model_prem_aniso()')
+< 
+< !
+< !--- mantle: from d670 to d220
+< !
+<   else if (r > R670 .and. r < R220) then
+<     if (idoubling /= IFLAG_670_220) &
+<       call exit_MPI(myrank,'wrong doubling flag for d670 to d220 point in model_prem_aniso()')
+< 
+< !
+< !--- mantle and crust: from d220 to MOHO and then to surface
+< !
+<   else if (r > R220) then
+<     if (idoubling /= IFLAG_220_80 .and. idoubling /= IFLAG_80_MOHO .and. idoubling /= IFLAG_CRUST) &
+<       call exit_MPI(myrank,'wrong doubling flag for d220 to Moho to surface point in model_prem_aniso()')
+< 
+<   endif
+< 
+< ! no anisotropy by default
+<   eta_aniso = 1.d0
+< 
+< !
+< !--- inner core
+< !
+<   if (r >= 0.d0 .and. r <= RICB) then
+<     rho=13.0885d0-8.8381d0*x*x
+<     vpv=11.2622d0-6.3640d0*x*x
+<     vsv=3.6678d0-4.4475d0*x*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=84.6d0
+<     Qkappa=1327.7d0
+< !
+< !--- outer core
+< !
+<   else if (r > RICB .and. r <= RCMB) then
+<     rho=12.5815d0-1.2638d0*x-3.6426d0*x*x-5.5281d0*x*x*x
+<     vpv=11.0487d0-4.0362d0*x+4.8023d0*x*x-13.5732d0*x*x*x
+<     vsv=0.0d0
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=0.0d0
+<     Qkappa=57827.0d0
+< !
+< !--- D" at the base of the mantle
+< !
+<   else if (r > RCMB .and. r <= RTOPDDOUBLEPRIME) then
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+<     vpv=15.3891d0-5.3181d0*x+5.5242d0*x*x-2.5514d0*x*x*x
+<     vsv=6.9254d0+1.4672d0*x-2.0834d0*x*x+0.9783d0*x*x*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=312.0d0
+<     Qkappa=57827.0d0
+< !
+< !--- mantle: from top of D" to d670
+< !
+<   else if (r > RTOPDDOUBLEPRIME .and. r <= R771) then
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+<     vpv=24.9520d0-40.4673d0*x+51.4832d0*x*x-26.6419d0*x*x*x
+<     vsv=11.1671d0-13.7818d0*x+17.4575d0*x*x-9.2777d0*x*x*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=312.0d0
+<     Qkappa=57827.0d0
+<   else if (r > R771 .and. r <= R670) then
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+<     vpv=29.2766d0-23.6027d0*x+5.5242d0*x*x-2.5514d0*x*x*x
+<     vsv=22.3459d0-17.2473d0*x-2.0834d0*x*x+0.9783d0*x*x*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=312.0d0
+<     Qkappa=57827.0d0
+< !
+< !--- mantle: above d670
+< !
+<   else if (r > R670 .and. r <= R600) then
+<     rho=5.3197d0-1.4836d0*x
+<     vpv=19.0957d0-9.8672d0*x
+<     vsv=9.9839d0-4.9324d0*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=143.0d0
+<     Qkappa=57827.0d0
+<   else if (r > R600 .and. r <= R400) then
+<     rho=11.2494d0-8.0298d0*x
+<     vpv=39.7027d0-32.6166d0*x
+<     vsv=22.3512d0-18.5856d0*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=143.0d0
+<     Qkappa=57827.0d0
+<   else if (r > R400 .and. r <= R220) then
+<     rho=7.1089d0-3.8045d0*x
+<     vpv=20.3926d0-12.2569d0*x
+<     vsv=8.9496d0-4.4597d0*x
+<     vph=vpv
+<     vsh=vsv
+<     Qmu=143.0d0
+<     Qkappa=57827.0d0
+<   else if (r > R220 .and. r <= R80) then
+< 
+< ! anisotropy in PREM only above 220 km
+< 
+<     rho=2.6910d0+0.6924d0*x
+<     vpv=0.8317d0+7.2180d0*x
+<     vph=3.5908d0+4.6172d0*x
+<     vsv=5.8582d0-1.4678d0*x
+<     vsh=-1.0839d0+5.7176d0*x
+<     eta_aniso=3.3687d0-2.4778d0*x
+<     Qmu=80.0d0
+<     Qkappa=57827.0d0
+< 
+<   else
+<     if (CRUSTAL) then
+< ! fill with PREM mantle and later add CRUST2.0
+<       if (r > R80) then
+<         rho=2.6910d0+0.6924d0*x
+<         vpv=0.8317d0+7.2180d0*x
+<         vph=3.5908d0+4.6172d0*x
+<         vsv=5.8582d0-1.4678d0*x
+<         vsh=-1.0839d0+5.7176d0*x
+<         eta_aniso=3.3687d0-2.4778d0*x
+<         Qmu=600.0d0
+<         Qkappa=57827.0d0
+<       endif
+<     else
+< ! use PREM crust
+<       if (r > R80 .and. r <= RMOHO) then
+461,511d278
+< ! anisotropy in PREM only above 220 km
+< 
+<         rho=2.6910d0+0.6924d0*x
+<         vpv=0.8317d0+7.2180d0*x
+<         vph=3.5908d0+4.6172d0*x
+<         vsv=5.8582d0-1.4678d0*x
+<         vsh=-1.0839d0+5.7176d0*x
+<         eta_aniso=3.3687d0-2.4778d0*x
+<         Qmu=600.0d0
+<         Qkappa=57827.0d0
+< 
+< ! no anisotropy in the crust in PREM
+< 
+<       else if (r > RMOHO .and. r <= RMIDDLE_CRUST) then
+<         rho=2.9d0
+<         vpv=6.8d0
+<         vsv=3.9d0
+<         vph=vpv
+<         vsh=vsv
+<         Qmu=600.0d0
+<         Qkappa=57827.0d0
+< 
+< ! same properties everywhere in PREM crust (only one layer in the crust)
+<         if (ONE_CRUST) then
+<           rho=2.6d0
+<           vpv=5.8d0
+<           vsv=3.2d0
+<           vph=vpv
+<           vsh=vsv
+<           Qmu=600.0d0
+<           Qkappa=57827.0d0
+<         endif
+< 
+<       else if (r > RMIDDLE_CRUST .and. r <= ROCEAN) then
+<         rho=2.6d0
+<         vpv=5.8d0
+<         vsv=3.2d0
+<         vph=vpv
+<         vsh=vsv
+<         Qmu=600.0d0
+<         Qkappa=57827.0d0
+<       else if (r > ROCEAN) then
+<         rho=2.6d0
+<         vpv=5.8d0
+<         vsv=3.2d0
+<         vph=vpv
+<         vsh=vsv
+<         Qmu=600.0d0
+<         Qkappa=57827.0d0
+<       endif
+<     endif
+516,632c283,287
+< ! do not scale anisotropy parameter eta_aniso, which is dimensionless
+<   scaleval = dsqrt(PI*GRAV*RHOAV)
+<   rho = rho * 1000.0d0/RHOAV
+<   vpv = vpv * 1000.0d0/(R_EARTH*scaleval)
+<   vsv = vsv * 1000.0d0/(R_EARTH*scaleval)
+<   vph = vph * 1000.0d0/(R_EARTH*scaleval)
+<   vsh = vsh * 1000.0d0/(R_EARTH*scaleval)
+< 
+<   end subroutine model_prem_aniso
+< 
+< !
+< !=====================================================================
+< !
+< 
+<   subroutine model_prem_aniso_extended_isotropic(x,rho,vpv,vph,vsv,vsh,eta_aniso,Qkappa,Qmu, &
+<                                      idoubling,CRUSTAL,ONE_CRUST,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<                                      R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+< 
+< ! note: for 3D crustal models, we extend the mantle reference up to the surface and then superimpose the crustal values later.
+< !       however, PREM mantle is anisotropic (eta < 1 and vsh > vsv) and the extension continues with strong TISO, thus
+< !       extending it with anisotropic values up to the surface will create very fast, strong mantle elements
+< !       below thin oceanic crust. in particular, oceanic paths will see Love waves becoming too fast for mantle models
+< !       like S20RTS using PREM as reference model.
+< !
+< !       here, we will extend the mantle with isotropic values (averaged), and no radial anisotropy above moho depths.
+< 
+<   use constants
+< 
+<   implicit none
+< 
+< ! given a normalized radius x, gives the non-dimensionalized density rho,
+< ! speeds vp and vs, and the quality factors Qkappa and Qmu
+< 
+<   double precision,intent(in) :: x
+<   double precision,intent(out) :: rho,Qkappa,Qmu,vpv,vph,vsv,vsh,eta_aniso
+< 
+<   logical,intent(in) :: CRUSTAL,ONE_CRUST
+<   integer,intent(in) :: idoubling
+<   double precision,intent(in) :: RICB,RCMB,RTOPDDOUBLEPRIME,R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN
+< 
+<   ! local parameters
+<   double precision :: r,vp,vs
+<   double precision :: scaleval
+< 
+<   ! gets default values
+<   call model_prem_aniso(x,rho,vpv,vph,vsv,vsh,eta_aniso,Qkappa,Qmu, &
+<                         idoubling,CRUSTAL,ONE_CRUST,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<                         R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+< 
+<   if (CRUSTAL) then
+<     ! adds crustal model like CRUST2.0 later on top
+< 
+<     ! compute real physical radius in meters
+<     r = x * R_EARTH
+< 
+<     ! fills with PREM mantle only till moho depth
+<     if (r > R80 .and. r <= RMOHO) then
+<       rho = 2.6910d0 + 0.6924d0*x
+< 
+<       vpv = 0.8317d0 + 7.2180d0*x
+<       vph = 3.5908d0 + 4.6172d0*x
+< 
+<       vsv = 5.8582d0 - 1.4678d0*x
+<       vsh = -1.0839d0 + 5.7176d0*x
+< 
+<       eta_aniso = 3.3687d0 - 2.4778d0*x
+< 
+<       ! non-dimensionalize
+<       ! time scaling (s^{-1}) is done with scaleval
+<       ! do not scale anisotropy parameter eta_aniso, which is dimensionless
+<       scaleval = dsqrt(PI*GRAV*RHOAV)
+<       rho = rho * 1000.0d0/RHOAV
+<       vpv = vpv * 1000.0d0/(R_EARTH*scaleval)
+<       vsv = vsv * 1000.0d0/(R_EARTH*scaleval)
+<       vph = vph * 1000.0d0/(R_EARTH*scaleval)
+<       vsh = vsh * 1000.0d0/(R_EARTH*scaleval)
+< 
+<     ! extension to surface
+<     else if (r > RMOHO) then
+<       ! extends the mantle up to the surface
+<       ! uses isotropic values (averaged), no anisotropy above moho depths
+< 
+<       ! continues mantle trend
+<       rho = 2.6910d0 + 0.6924d0*x
+< 
+<       ! P-velocity
+<       vpv = 0.8317d0 + 7.2180d0*x
+<       vph = 3.5908d0 + 4.6172d0*x
+< 
+<       ! Voigt average:  v_avg**2 = ( 2 vpv**2 + vph**2 ) / 3
+<       vp = sqrt( (2.d0 * vpv**2 + vph**2) / 3.d0 )
+<       vpv = vp
+<       vph = vp
+< 
+<       ! S-velocity
+<       vsv = 5.8582d0 - 1.4678d0*x
+<       vsh = -1.0839d0 + 5.7176d0*x
+< 
+<       ! Voigt average:  v_avg**2 = ( 2 vsv**2 + vsh**2 ) / 3
+<       vs = sqrt( (2.d0 * vsv**2 + vsh**2) / 3.d0 )
+<       vsv = vs
+<       vsh = vs
+< 
+<       ! no radial anisotropy by default
+<       eta_aniso = 1.d0
+< 
+<       ! non-dimensionalize
+<       ! time scaling (s^{-1}) is done with scaleval
+<       ! do not scale anisotropy parameter eta_aniso, which is dimensionless
+<       scaleval = dsqrt(PI*GRAV*RHOAV)
+<       rho = rho * 1000.0d0/RHOAV
+<       vpv = vpv * 1000.0d0/(R_EARTH*scaleval)
+<       vsv = vsv * 1000.0d0/(R_EARTH*scaleval)
+<       vph = vph * 1000.0d0/(R_EARTH*scaleval)
+<       vsh = vsh * 1000.0d0/(R_EARTH*scaleval)
+<     endif
+<   endif ! CRUSTAL
+---
+>   scaleval=dsqrt(PI*GRAV*RHOAV)
+>   drhodr=drhodr*1000.0d0/RHOAV
+>   rho=rho*1000.0d0/RHOAV
+>   vp=vp*1000.0d0/(R_EARTH*scaleval)
+>   vs=vs*1000.0d0/(R_EARTH*scaleval)
+634c289
+<   end subroutine model_prem_aniso_extended_isotropic
+---
+>   end subroutine model_Sohl
+640c295
+<   subroutine prem_display_outer_core(x,rho,vp,vs,Qkappa,Qmu,idoubling)
+---
+>   subroutine Sohl_display_outer_core(x,rho,vp,vs,Qkappa,Qmu,idoubling)
+652,653c307,308
+<   integer :: idoubling
+<   double precision :: x,rho,vp,vs,Qkappa,Qmu
+---
+>   integer idoubling!,myrank
+>   double precision x,rho,vp,vs,Qkappa,Qmu
+655c310
+<   double precision :: scaleval
+---
+>   double precision scaleval
+663,667c318,322
+<   rho    = 12.5815d0-1.2638d0 * x - 3.6426d0 * x*x - 5.5281d0 * x*x*x
+<   vp     = 11.0487d0-4.0362d0 * x + 4.8023d0 * x*x - 13.5732d0 * x*x*x
+<   vs     = 0.0d0
+<   Qmu    = 0.0d0
+<   Qkappa = 57827.0d0
+---
+>   rho=7.2942d0-13.4654d-3*x-1.6906d0*x*x-0.4225d0*x*x*x
+>   vp=6.5395d0-22.5299d-3*x-2.3767d0*x*x-7.2716d-1*x*x*x
+>   vs=0.0d0
+>   Qmu=0.0d0
+>   Qkappa=57827.0d0
+676c331
+<   end subroutine prem_display_outer_core
+---
+>   end subroutine Sohl_display_outer_core
+682,683c337,338
+<   subroutine prem_density(x,rho,ONE_CRUST,RICB,RCMB,RTOPDDOUBLEPRIME, &
+<                           R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+---
+>   subroutine Sohl_density(x,rho,ONE_CRUST,RICB,RCMB,RTOPDDOUBLEPRIME, &
+>       R600,R670,R220,R771,R400,R80,RMOHO,RMIDDLE_CRUST,ROCEAN)
+689c344
+<   double precision :: x,rho,RICB,RCMB,RTOPDDOUBLEPRIME, &
+---
+>   double precision x,rho,RICB,RCMB,RTOPDDOUBLEPRIME, &
+692c347
+<   logical :: ONE_CRUST
+---
+>   logical ONE_CRUST
+694c349
+<   double precision :: r
+---
+>   double precision r
+701c356
+<     rho=13.0885d0-8.8381d0*x*x
+---
+>     rho=7.2942d0-13.4654d-3*x-1.6906d0*x*x-0.4225d0*x*x*x
+703c358
+<     rho=12.5815d0-1.2638d0*x-3.6426d0*x*x-5.5281d0*x*x*x
+---
+>     rho=7.2942d0-13.4654d-2*x-1.6906d0*x*x-0.4225d0*x*x*x
+705c360
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+---
+>     rho=4.5706d0-0.5184d0*x-3.2190d-2*x*x-1.3738d-1*x*x*x
+707c362
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+---
+>     rho=4.5706d0-0.5184d0*x-3.2190d-2*x*x-1.3738d-1*x*x*x
+709c364
+<     rho=7.9565d0-6.4761d0*x+5.5283d0*x*x-3.0807d0*x*x*x
+---
+>     rho=4.4067d0-5.8162d-1*x+1.7083d-1*x*x-3.0264d-1*x*x*x
+711c366
+<     rho=5.3197d0-1.4836d0*x
+---
+>     rho=4.1601d0-0.8166d0*x+0.4844d0*x*x-0.4175d0*x*x*x
+713c368
+<     rho=11.2494d0-8.0298d0*x
+---
+>     rho=4.1601d0-0.8166d0*x+0.4844d0*x*x-0.4175d0*x*x*x
+715c370
+<     rho=7.1089d0-3.8045d0*x
+---
+>     rho=4.1601d0-0.8166d0*x+0.4844d0*x*x-0.4175d0*x*x*x
+717c372
+<     rho=2.6910d0+0.6924d0*x
+---
+>     rho=1.3572d01-3.4678d01*x+4.0167d01*x*x-1.5572d01*x*x*x
+720c375
+<       rho=2.6910d0+0.6924d0*x
+---
+>       rho=2.2095d0+1.7831d0*x+1.2168d0*x*x-1.7209d0*x*x*x
+723c378
+<         rho=2.6d0
+---
+>         rho=2.815d0
+725c380
+<         rho=2.9d0
+---
+>         rho=-3.6937d01+1.2062d02*x-1.2140d02*x*x+4.0519d01*x*x*x
+728c383
+<       rho=2.6d0
+---
+>       rho=-3.6937d01+1.2062d02*x-1.2140d02*x*x+4.0519d01*x*x*x
+730c385
+<       rho=2.6d0
+---
+>       rho=-3.6937d01+1.2062d02*x-1.2140d02*x*x+4.0519d01*x*x*x
+734c389
+<   rho = rho * 1000.0d0 / RHOAV
+---
+>   rho=rho*1000.0d0/RHOAV
+736c391
+<   end subroutine prem_density
+---
+>   end subroutine Sohl_density
