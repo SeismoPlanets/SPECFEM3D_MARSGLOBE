@@ -1,0 +1,425 @@
+14c14
+< ! the Free Software Foundation; either version 3 of the License, or
+---
+> ! the Free Software Foundation; either version 2 of the License, or
+35c35
+<   use constants, only: &
+---
+>   use constants,only: &
+38c38
+<     SUPPRESS_MOHO_STRETCHING,ICRUST_CRUST_SH
+---
+>     SUPPRESS_MOHO_STRETCHING
+40,41c40,41
+<   use meshfem3D_par, only: &
+<     RMOHO_FICTITIOUS_IN_MESHER,R220,RMIDDLE_CRUST,REFERENCE_CRUSTAL_MODEL
+---
+>   use meshfem3D_par,only: &
+>     RMOHO_FICTITIOUS_IN_MESHER,R220,RMIDDLE_CRUST
+43c43
+<   use meshfem3D_par, only: &
+---
+>   use meshfem3D_par,only: &
+54,55c54
+<   double precision :: vpvc,vphc,vsvc,vshc,etac,rhoc
+<   double precision :: moho,elevation,gamma
+---
+>   double precision :: vpc,vsc,rhoc,moho,elevation,gamma
+62c61
+<   double precision,parameter :: MOHO_MINIMUM_DEFAULT = 5.0 / R_EARTH_KM
+---
+>   double precision,parameter :: MOHO_MINIMUM = 5.0 / R_EARTH_KM
+64,75c63,64
+< !  double precision,parameter :: MOHO_MAXIMUM_DEFAULT = 90.0 / R_EARTH_KM
+<   double precision,parameter :: MOHO_MAXIMUM_DEFAULT = 150.0 / R_EARTH_KM
+< 
+<   double precision :: MOHO_MINIMUM,MOHO_MAXIMUM
+< 
+<   ! sets min/max allowed moho depth
+<   MOHO_MINIMUM = MOHO_MINIMUM_DEFAULT
+<   MOHO_MAXIMUM = MOHO_MAXIMUM_DEFAULT
+<   if (REFERENCE_CRUSTAL_MODEL == ICRUST_CRUST_SH) then
+<     ! minimum moho < 3.9km
+<     MOHO_MINIMUM = 3.5d0 / R_EARTH_KM
+<   endif
+---
+>   !double precision,parameter :: MOHO_MAXIMUM = 90.0 / R_EARTH_KM
+>   double precision,parameter :: MOHO_MAXIMUM = 150.0 / R_EARTH_KM
+114,127c103
+<     call meshfem3D_model_crust(lat,lon,r,vpvc,vphc,vsvc,vshc,etac,rhoc,moho,found_crust,elem_in_crust)
+< 
+<    !=== Youyi Ruan 10/21/2016 Mars spot check
+<     !if (lon > 140.0 .and. lon < 143. .and. lat < -42. .and. lat > -45. .and. ia
+<     !== 27) then
+<     !  print '(a, I4, 4F12.4)', 'crust map:', ia, lat, lon, (ONE-r)*R_EARTH_KM,
+<     !  moho*R_EARTH_KM 
+<     !endif
+< 
+<     if (r > 1.02d0) then
+<       print '(a,4F12.4)', 'DEBUG moho_stretching_honor_crust_reg(): lat, lon, r, moho =', lat, lon, r, moho
+<       stop 'stop for detecting large r'
+<     endif
+<     !=== end 
+---
+>     call meshfem3D_model_crust(lat,lon,r,vpc,vsc,rhoc,moho,found_crust,elem_in_crust)
+138c114
+<         print *,'moho value exceeds minimum (in km): ',moho*R_EARTH_KM,MOHO_MINIMUM*R_EARTH_KM,'lat/lon:',lat,lon
+---
+>         print*,'moho value exceeds minimum (in km): ',moho*R_EARTH_KM,MOHO_MINIMUM*R_EARTH_KM,'lat/lon:',lat,lon
+142c118
+<         print *,'moho value exceeds maximum (in km): ',moho*R_EARTH_KM,MOHO_MAXIMUM*R_EARTH_KM,'lat/lon:',lat,lon
+---
+>         print*,'moho value exceeds maximum (in km): ',moho*R_EARTH_KM,MOHO_MAXIMUM*R_EARTH_KM,'lat/lon:',lat,lon
+187c163
+<         else if (moho > R_middlecrust) then
+---
+>         else  if (moho > R_middlecrust) then
+242c218
+<     print *,'Error moho stretching: ',r*R_EARTH,R220,moho*R_EARTH
+---
+>     print*,'Error moho stretching: ',r*R_EARTH,R220,moho*R_EARTH
+263c239
+<   use constants, only: &
+---
+>   use constants,only: &
+268c244
+<   use meshfem3D_par, only: &
+---
+>   use meshfem3D_par,only: &
+280,284c256,259
+<   integer :: ia,count_crust,count_mantle
+<   double precision :: r,theta,phi,lat,lon
+<   double precision :: vpvc,vphc,vsvc,vshc,etac,rhoc
+<   double precision :: moho
+<   logical :: found_crust
+---
+>   integer:: ia,count_crust,count_mantle
+>   double precision:: r,theta,phi,lat,lon
+>   double precision:: vpc,vsc,rhoc,moho
+>   logical:: found_crust
+321c296,307
+<     call meshfem3D_model_crust(lat,lon,r,vpvc,vphc,vsvc,vshc,etac,rhoc,moho,found_crust,elem_in_crust)
+---
+>     call meshfem3D_model_crust(lat,lon,r,vpc,vsc,rhoc,moho,found_crust,elem_in_crust)
+> 
+>     !=== Youyi Ruan 10/21/2016 Mars spot check
+>     !if (lon > 140.0 .and. lon < 143. .and. lat < -42. .and. lat > -45. .and. ia == 27) then
+>     !  print '(a, I4, 4F12.4)', 'crust map:', ia, lat, lon, (ONE-r)*R_EARTH_KM, moho*R_EARTH_KM 
+>     !endif
+> 
+>     if (r > 1.02d0) then
+>       print '(a,4F12.4)', 'DEBUG moho_stretching_honor_crust_reg(): lat, lon, r, moho =', lat, lon, r, moho
+>       stop 'stop for detecting large r'
+>     endif
+>     !=== end 
+324c310
+<     if (abs(moho) < TINYVAL ) call exit_mpi(myrank,'Error moho depth in crust_reg to honor')
+---
+>     if (abs(moho) < TINYVAL ) call exit_mpi(myrank,'Error moho depth to honor')
+345,348c331,332
+<     !if (lon > 140.0 .and. lon < 143. .and. lat < -42. .and. lat > -45.0 .and.
+<     !ia == 27) then
+<     !  print '(a, I4, 4F12.4)', 'stretch:  ', ia, lat, lon, (ONE-r)*R_EARTH_KM,
+<     !  (ONE - moho)*R_EARTH_KM 
+---
+>     !if (lon > 140.0 .and. lon < 143. .and. lat < -42. .and. lat > -45.0 .and. ia == 27) then
+>     !  print '(a, I4, 4F12.4)', 'stretch:  ', ia, lat, lon, (ONE-r)*R_EARTH_KM, (ONE - moho)*R_EARTH_KM 
+352d335
+< 
+377c360
+<     print *,'Error moho stretching: ',r*R_EARTH,R220,moho*R_EARTH
+---
+>     print*,'Error moho stretching: ',r*R_EARTH,R220,moho*R_EARTH
+392c375
+<   use meshfem3D_par, only: RMOHO_FICTITIOUS_IN_MESHER,R220,RMIDDLE_CRUST
+---
+>   use meshfem3D_par,only: RMOHO_FICTITIOUS_IN_MESHER,R220,RMIDDLE_CRUST
+396c379
+<   integer :: ia
+---
+>   integer ia
+398,400c381,383
+<   double precision :: xelm(NGNOD)
+<   double precision :: yelm(NGNOD)
+<   double precision :: zelm(NGNOD)
+---
+>   double precision xelm(NGNOD)
+>   double precision yelm(NGNOD)
+>   double precision zelm(NGNOD)
+409,417d391
+< !  double precision,parameter ::  R15=6356000.d0/R_EARTH
+< !  double precision,parameter ::  R25=6346000.d0/R_EARTH
+< !  double precision,parameter ::  R30=6341000.d0/R_EARTH
+< !  double precision,parameter ::  R35=6336000.d0/R_EARTH
+< !  double precision,parameter ::  R40=6331000.d0/R_EARTH
+< !  double precision,parameter ::  R45=6326000.d0/R_EARTH
+< !  double precision,parameter ::  R50=6321000.d0/R_EARTH
+< !  double precision,parameter ::  R55=6316000.d0/R_EARTH
+< !  double precision,parameter ::  R60=6311000.d0/R_EARTH
+430d403
+< 
+432c405
+<   !if (RMOHO_STRETCH_ADJUSTMENT /= -20000.d0 ) &
+---
+> 
+434a408
+> 
+436a411
+> 
+439,441c414,415
+< !  ! checks middle crust position: supposed to be bottom of first layer at 15 km
+< !  if (RMIDDLE_CRUST/R_EARTH /= R15 ) &
+< !    stop 'wrong middle crust depth'
+---
+>   !if (RMIDDLE_CRUST/R_EARTH /= R15 ) &
+>   !  stop 'wrong middle crust depth'
+444,445c418,419
+<   if (moho < R25 .and. moho > R45) then
+<     ! moho between r25 and r45
+---
+>   if (moho < R25 .and. moho >= R35) then
+>     ! moho between r25 and r35
+447,453c421,427
+<     ! stretches mesh at r35 to moho depth
+<     elevation = moho - R35
+<     if (r >= R35 .and. r < R15) then
+<       gamma=((R15-r)/(R15-R35))
+<     else if (r < R35 .and. r > R60) then
+<       gamma = (( r - R60)/( R35 - R60)) ! keeps r60 fixed
+<       if (abs(gamma) < SMALLVAL) then
+---
+>     ! stretches mesh at R30 to moho depth
+>     elevation = moho - R30
+>     if (r >= R30 .and. r < R15) then
+>       gamma=((R15 - r)/(R15 - R30)) 
+>     else if (r < R30 .and. r > R60) then
+>       gamma = ((r - R60)/(R30 - R60)) ! keeps R60 fixed
+>       if (abs(gamma)<SMALLVAL) then
+458a433
+> 
+460c435
+<       stop 'incorrect value of gamma for moho from crust 2.0'
+---
+>       stop 'incorrect value of gamma for moho between R25 and R35'
+464,465c439,440
+<   else if (moho < R45) then
+<     ! moho below r45
+---
+>   else if (moho < R35 .and. moho >= R45) then
+>     ! moho between R35 and r45
+467,473c442,490
+<     ! moves mesh at r35 down to r45
+<     elevation = R45 - R35
+<     if (r >= R35 .and. r < R15) then
+<       gamma=((R15-r)/(R15-R35)) ! moves r35 down to r45
+<     else if (r < R35 .and. r > R60) then
+<       gamma=((r-R60)/(R35-R60)) ! keeps r60 fixed
+<       if (abs(gamma) < SMALLVAL) then
+---
+>     ! stretch mesh at R40 to moho depth
+>     elevation = moho - R40
+>     if (r >= R40 .and. r < R15) then
+>       gamma=((R15 - r)/(R15 - R40))
+>     else if (r < R40 .and. r > R60) then
+>       gamma=((r - R60)/(R40 - R60)) ! keeps R60 fixed
+>       if (abs(gamma)<SMALLVAL) then
+>         gamma=0.0d0
+>       endif
+>     else
+>       gamma=0.0d0
+>     endif
+> 
+>     if (gamma < -0.0001d0 .or. gamma > 1.0001d0) &
+>       stop 'incorrect value of gamma for moho between R35 and R45'
+> 
+>     call move_point(ia,xelm,yelm,zelm,x,y,z,gamma,elevation,r)
+> 
+>   else if (moho < R45 .and. moho >= R55) then
+>     ! moho between R45 and R55
+> 
+>     ! stretch mesh at R50 to moho depth
+>     elevation = moho - R50
+>     if (r >= R50 .and. r < R15) then
+>       gamma=((R15 - r)/(R15 - R50)) 
+>     else if (r < R50 .and. r > R60) then
+>       gamma=((r - R60)/(R50 - R60)) ! keeps R60 fixed
+>       if (abs(gamma)<SMALLVAL) then
+>         gamma=0.0d0
+>       endif
+>     else
+>       gamma=0.0d0
+>     endif
+> 
+>     if (gamma < -0.0001d0 .or. gamma > 1.0001d0) &
+>       stop 'incorrect value of gamma for moho between R45 and R55'
+> 
+>     call move_point(ia,xelm,yelm,zelm,x,y,z,gamma,elevation,r)
+>     
+>   else if (moho < R55) then
+>     ! moho below R55
+> 
+>     ! move R50 down to R55
+>     elevation = R55 - R50
+>     if (r >= R50 .and. r < R15) then 
+>       gamma=((R15-r)/(R15-R50))
+>     else if (r < R50 .and. r > R60) then
+>       gamma=((r - R60)/(R50 - R60)) ! keeps R60 fixed
+>       if (abs(gamma)<SMALLVAL) then
+478a496
+> 
+486c504
+<       ! moho below r60
+---
+>       ! moho below R60
+488c506
+<       ! stretches mesh at r60 to moho
+---
+>       ! stretches mesh at R60 to moho
+490,494c508,512
+<       if (r < R45 .and. r >= R60) then
+<         gamma=(R45-r)/(R45-R60)
+<       else if (r < R60) then
+<         gamma=(r-R220/R_EARTH)/(R60-R220/R_EARTH)
+<         if (abs(gamma) < SMALLVAL) then
+---
+>       if (r < R55 .and. r >= R60) then
+>         gamma=(R55 - r)/(R55 - R60)
+>       else if (r < R60 .and. r > R220/R_EARTH) then
+>         gamma=(r - R220/R_EARTH)/(R60 - R220/R_EARTH)
+>         if (abs(gamma)<SMALLVAL) then
+512c530
+<     ! moho above r25
+---
+>     ! moho above R25
+514,520c532,538
+<     ! moves mesh at r35 up to r25
+<     elevation = R25-R35
+<     if (r >= R35 .and. r < R15) then
+<       gamma=((R15-r)/(R15-R35)) ! stretches r35 up to r25
+<     else if (r < R35 .and. r > R60) then
+<       gamma=(r-R60)/(R35-R60) ! keeps r60 fixed
+<       if (abs(gamma) < SMALLVAL) then
+---
+>     ! moves mesh at R30 up to R25
+>     elevation = R25 - R30
+>     if (r >= R30 .and. r < R15) then
+>       gamma=((R15 - r)/(R15 - R30)) !
+>     else if (r < R30 .and. r > R60) then
+>       gamma=(r - R60)/(R30 - R60) ! keeps r60 fixed
+>       if (abs(gamma)<SMALLVAL) then
+525a544
+> 
+533c552
+<       ! moho above r15
+---
+>       ! moho above R15
+535,536c554,555
+<       ! stretches mesh at r15 to moho depth
+<       elevation = moho-R15
+---
+>       ! stretches mesh at R15 to moho depth
+>       elevation = moho - R15
+538c557
+<         gamma=(R_UNIT_SPHERE-r)/(R_UNIT_SPHERE-R15)
+---
+>         gamma=(R_UNIT_SPHERE - r)/(R_UNIT_SPHERE - R15)
+540,541c559,560
+<         gamma=(r-R25)/(R15-R25) ! keeps mesh at r25 fixed
+<         if (abs(gamma) < SMALLVAL) then
+---
+>         gamma=(r - R25)/(R15 - R25) ! keeps mesh at R25 fixed
+>         if (abs(gamma)<SMALLVAL) then
+550,551c569
+<         !print '(a, 3F12.4)', 'DEBUG (moho > R15)', moho*R_EARTH/1000.,
+<         !r*R_EARTH/1000., gamma
+---
+>         !print '(a, 3F12.4)', 'DEBUG (moho > R15)', moho*R_EARTH/1000., r*R_EARTH/1000., gamma
+557,558d574
+< 
+< 
+575c591
+<   use meshfem3D_par, only: RMOHO_FICTITIOUS_IN_MESHER,R220,RMIDDLE_CRUST
+---
+>   use meshfem3D_par,only: RMOHO_FICTITIOUS_IN_MESHER,R220,RMIDDLE_CRUST
+579c595
+<   integer :: ia
+---
+>   integer ia
+581,583c597,599
+<   double precision :: xelm(NGNOD)
+<   double precision :: yelm(NGNOD)
+<   double precision :: zelm(NGNOD)
+---
+>   double precision xelm(NGNOD)
+>   double precision yelm(NGNOD)
+>   double precision zelm(NGNOD)
+600a617
+> 
+614c631
+<     if (r >= R35 .and. r < R15) then
+---
+>     if (r >=R35.and.r<R15) then
+616c633
+<     else if (r < R35 .and. r > R220/R_EARTH) then
+---
+>     else if (r<R35.and.r>R220/R_EARTH) then
+618c635
+<       if (abs(gamma) < SMALLVAL) then
+---
+>       if (abs(gamma)<SMALLVAL) then
+634c651
+<     if (r >= R35 .and. r < R15) then
+---
+>     if (r>= R35.and.r<R15) then
+636c653
+<     else if (r < R35 .and. r > R220/R_EARTH) then
+---
+>     else if (r<R35.and.r>R220/R_EARTH) then
+638c655
+<       if (abs(gamma) < SMALLVAL) then
+---
+>       if (abs(gamma)<SMALLVAL) then
+654c671
+<     if (r >= R35 .and. r < R15) then
+---
+>     if (r>=R35.and.r<R15) then
+656c673
+<     else if (r < R35 .and. r > R220/R_EARTH) then
+---
+>     else if (r<R35.and.r>R220/R_EARTH) then
+658c675
+<       if (abs(gamma) < SMALLVAL) then
+---
+>       if (abs(gamma)<SMALLVAL) then
+670c687
+<     if (moho > R15) then
+---
+>     if (moho >R15) then
+672c689
+<       if (r >= R15) then
+---
+>       if (r>=R15) then
+674c691
+<       else if (r < R15 .and. R > R25) then
+---
+>       else if (r<R15.and.R>R25) then
+676c693
+<         if (abs(gamma) < SMALLVAL) then
+---
+>         if (abs(gamma)<SMALLVAL) then
+697c714
+<   use constants, only: NGNOD,ONE
+---
+>   use constants,only: NGNOD,ONE
+701c718
+<   integer :: ia
+---
+>   integer ia
+703,705c720,722
+<   double precision :: xelm(NGNOD)
+<   double precision :: yelm(NGNOD)
+<   double precision :: zelm(NGNOD)
+---
+>   double precision xelm(NGNOD)
+>   double precision yelm(NGNOD)
+>   double precision zelm(NGNOD)
